@@ -1,0 +1,55 @@
+version: "3.3"
+services:
+    app:
+        image: nit-archive-backend:latest
+        build:
+          dockerfile: Dockerfile
+          context: ./backend
+        volumes:
+            - /nit/backend/storage:/app/.nit
+        networks:
+            - net
+            - traefik-public
+        depends_on:
+            - mysql
+        env_file: backend.env
+        deploy:
+            labels:
+                - traefik.enable=true
+                - traefik.docker.network=traefik-public
+                - traefik.constraint-label=traefik-public
+                - traefik.http.middlewares.https-redirect.redirectscheme.scheme=https
+                - traefik.http.middlewares.https-redirect.redirectscheme.permanent=true
+                - traefik.http.routers.backend-https.rule=Host(`${BACKEND_DOMAIN}`)
+                - traefik.http.routers.backend-https.entrypoints=https
+                - traefik.http.routers.backend-http.rule=Host(`${BACKEND_DOMAIN}`)
+                - traefik.http.routers.backend-http.entrypoints=http
+                - traefik.http.routers.backend-http.middlewares=https-redirect
+                - traefik.http.services.backend.loadbalancer.server.port=3000
+                - traefik.http.routers.backend-https.tls=true
+                - traefik.http.routers.backend-https.tls.certresolver=le
+    mysql:
+        image: mysql:8
+        environment:
+          - MYSQL_DATABASE=${MYSQL_DATABASE}
+          - MYSQL_USER=${MYSQL_USER}
+          - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+          - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+          - MYSQL_ROOT_HOST=%
+          - MYSQL_ALLOW_EMPTY_PASSWORD=ok
+          - TZ=${TZ}
+        volumes:
+            - /nit/mysql:/var/lib/mysql
+        networks:
+            - net
+        deploy:
+            placement:
+                constraints:
+                    - node.labels.backend.db-data == true
+                    - node.role == manager # Deploy the Mysql service on manager nodes.
+networks:
+    net:
+        driver: overlay
+        attachable: true
+    traefik-public:
+        external: true

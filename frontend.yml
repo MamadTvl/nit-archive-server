@@ -1,0 +1,38 @@
+version: "3.3"
+services:
+    app:
+        image: nit-archive-frontend:latest
+        build:
+          dockerfile: Dockerfile
+          context: ./frontend
+          args:
+            - API_BASE_URL=https://api.nit.edlano.com
+            - DL_BASE_URL=https://dl.nit.edlano.com
+            - IMAGE_DOMAINS=dl.nit.edlano.com
+            - DOMAIN=nit.edlano.com
+            - BUILD_DEBUG=0
+        networks:
+            - net
+            - traefik-public
+        env_file: frontend.env
+        deploy:
+            labels:
+                - traefik.enable=true
+                - traefik.docker.network=traefik-public
+                - traefik.constraint-label=traefik-public
+                - traefik.http.middlewares.https-redirect.redirectscheme.scheme=https
+                - traefik.http.middlewares.https-redirect.redirectscheme.permanent=true
+                - traefik.http.routers.frontend-https.rule=Host(`${FRONTEND_DOMAIN}`)
+                - traefik.http.routers.frontend-https.entrypoints=https
+                - traefik.http.routers.frontend-http.rule=Host(`${FRONTEND_DOMAIN}`)
+                - traefik.http.routers.frontend-http.entrypoints=http
+                - traefik.http.routers.frontend-http.middlewares=https-redirect
+                - traefik.http.services.frontend.loadbalancer.server.port=3000
+                - traefik.http.routers.frontend-https.tls=true
+                - traefik.http.routers.frontend-https.tls.certresolver=le
+networks:
+    net:
+        driver: overlay
+        attachable: true
+    traefik-public:
+        external: true
