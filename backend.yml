@@ -83,6 +83,7 @@ services:
             - TZ=Asia/Tehran
         volumes:
             - /nit/mysql:/var/lib/mysql
+            - ./mysql/my.cnf:/etc/mysql/my.cnf:ro
         networks:
             - net
 networks:
