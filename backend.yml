@@ -12,6 +12,7 @@ services:
             - traefik-public
         depends_on:
             - mysql
+            - redis
         env_file: backend.env
         deploy:
             labels:
