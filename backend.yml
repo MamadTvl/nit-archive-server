@@ -85,11 +85,6 @@ services:
             - /nit/mysql:/var/lib/mysql
         networks:
             - net
-        deploy:
-            placement:
-                constraints:
-                    - node.labels.backend.db-data == true
-                    - node.role == manager # Deploy the Mysql service on manager nodes.
 networks:
     net:
         driver: overlay
