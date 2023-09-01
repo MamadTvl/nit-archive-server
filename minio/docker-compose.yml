@@ -25,19 +25,18 @@ services:
         - traefik.http.middlewares.https-redirect.redirectscheme.scheme=https
         - traefik.http.middlewares.https-redirect.redirectscheme.permanent=true
         
-        - traefik.http.routers.s3-api.service=s3-api
         - traefik.http.routers.s3-api-https.rule=Host(`${MINIO_DOMAIN?Variable not set}`)
         - traefik.http.routers.s3-api-https.entrypoints=https #- traefik.http.routers.minio-https.service=minio
         - traefik.http.routers.s3-api-http.rule=Host(`${MINIO_DOMAIN?Variable not set}`)
         - traefik.http.routers.s3-api-http.entrypoints=http
         - traefik.http.routers.s3-api-http.middlewares=https-redirect #- traefik.http.routers.minio-http.service=minio
+        - traefik.http.routers.s3-api-http.service=s3-api
         - traefik.http.services.s3-api.loadbalancer.server.port=9000
         - traefik.http.routers.s3-api-https.tls=true
         - traefik.http.routers.s3-api-https.tls.certresolver=le
-        - traefik.http.routers.minio-console.service=minio-console
+
         - traefik.http.routers.minio-console-https.rule=Host(`${MINIO_CONSOLE_DOMAIN?Variable not set}`)
         - traefik.http.routers.minio-console-https.entrypoints=https
-        - traefik.http.routers.minio-console-https.service=minio-console
         - traefik.http.routers.minio-console-http.rule=Host(`${MINIO_CONSOLE_DOMAIN?Variable not set}`)
         - traefik.http.routers.minio-console-http.entrypoints=http
         - traefik.http.routers.minio-console-http.middlewares=https-redirect
