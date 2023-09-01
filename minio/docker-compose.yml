@@ -33,6 +33,7 @@ services:
         - traefik.http.services.minio.loadbalancer.server.port=9000
         - traefik.http.routers.minio-https.tls=true
         - traefik.http.routers.minio-https.tls.certresolver=le
+        
         - traefik.http.routers.minio-console-https.rule=Host(`${MINIO_CONSOLE_DOMAIN?Variable not set}`)
         - traefik.http.routers.minio-console-https.entrypoints=https
         - traefik.http.routers.minio-console-https.service=minio-console
@@ -41,6 +42,8 @@ services:
         - traefik.http.routers.minio-console-http.middlewares=https-redirect
         - traefik.http.routers.minio-console-http.service=minio-console
         - traefik.http.services.minio-console.loadbalancer.server.port=9001
+        - traefik.http.routers.minio-console-https.tls=true
+        - traefik.http.routers.minio-console-https.tls.certresolver=le
 
     command: minio server /data --console-address ":9001"
 
