@@ -18,6 +18,8 @@ services:
                 - traefik.enable=true
                 - traefik.docker.network=traefik-public
                 - traefik.constraint-label=traefik-public
+                - traefik.http.routers.backend-http.service=backend
+                - traefik.http.routers.backend-https.service=backend
                 - traefik.http.middlewares.https-redirect.redirectscheme.scheme=https
                 - traefik.http.middlewares.https-redirect.redirectscheme.permanent=true
                 - traefik.http.routers.backend-https.rule=Host(`${BACKEND_DOMAIN}`)
@@ -45,6 +47,8 @@ services:
                 - traefik.enable=true
                 - traefik.docker.network=traefik-public
                 - traefik.constraint-label=traefik-public
+                - traefik.http.routers.pma-http.service=pma
+                - traefik.http.routers.pma-https.service=pma
                 - traefik.http.middlewares.https-redirect.redirectscheme.scheme=https
                 - traefik.http.middlewares.https-redirect.redirectscheme.permanent=true
                 - traefik.http.routers.pma-https.rule=Host(`${PMA_DOMAIN}`)
@@ -55,6 +59,17 @@ services:
                 - traefik.http.services.pma.loadbalancer.server.port=80
                 - traefik.http.routers.pma-https.tls=true
                 - traefik.http.routers.pma-https.tls.certresolver=le
+    redis:
+        image: redis:alpine
+        command: --requirepass ${REDIS_PASSWORD}
+        environment:
+            - REDIS_PASSWORD=${REDIS_PASSWORD}
+            - REDIS_PORT_NUMBER=6379
+            - TZ=Asia/Tehran
+        volumes:
+            - /nit/redis:/data
+        networks:
+            - net
     mysql:
         image: mysql:8
         environment:
