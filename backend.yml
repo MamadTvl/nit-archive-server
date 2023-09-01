@@ -3,8 +3,8 @@ services:
     app:
         image: nit-archive-backend:latest
         build:
-          dockerfile: Dockerfile
-          context: ./backend
+            dockerfile: Dockerfile
+            context: ./backend
         volumes:
             - /nit/backend/storage:/app/.nit
         networks:
@@ -28,16 +28,43 @@ services:
                 - traefik.http.services.backend.loadbalancer.server.port=3000
                 - traefik.http.routers.backend-https.tls=true
                 - traefik.http.routers.backend-https.tls.certresolver=le
+    admin:
+        image: phpmyadmin/phpmyadmin
+        networks:
+            - net
+            - traefik-public
+        depends_on:
+            - mysql
+        environment:
+            - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+            - PMA_HOST=mysql
+            - PMA_PORT=3306
+            - TZ=Asia/Tehran
+        deploy:
+            labels:
+                - traefik.enable=true
+                - traefik.docker.network=traefik-public
+                - traefik.constraint-label=traefik-public
+                - traefik.http.middlewares.https-redirect.redirectscheme.scheme=https
+                - traefik.http.middlewares.https-redirect.redirectscheme.permanent=true
+                - traefik.http.routers.pma-https.rule=Host(`${PMA_DOMAIN}`)
+                - traefik.http.routers.pma-https.entrypoints=https
+                - traefik.http.routers.pma-http.rule=Host(`${PMA_DOMAIN}`)
+                - traefik.http.routers.pma-http.entrypoints=http
+                - traefik.http.routers.pma-http.middlewares=https-redirect
+                - traefik.http.services.pma.loadbalancer.server.port=80
+                - traefik.http.routers.pma-https.tls=true
+                - traefik.http.routers.pma-https.tls.certresolver=le
     mysql:
         image: mysql:8
         environment:
-          - MYSQL_DATABASE=${MYSQL_DATABASE}
-          - MYSQL_USER=${MYSQL_USER}
-          - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-          - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-          - MYSQL_ROOT_HOST=%
-          - MYSQL_ALLOW_EMPTY_PASSWORD=ok
-          - TZ=${TZ}
+            - MYSQL_DATABASE=${MYSQL_DATABASE}
+            - MYSQL_USER=${MYSQL_USER}
+            - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+            - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+            - MYSQL_ROOT_HOST=%
+            - MYSQL_ALLOW_EMPTY_PASSWORD=ok
+            - TZ=Asia/Tehran
         volumes:
             - /nit/mysql:/var/lib/mysql
         networks:
