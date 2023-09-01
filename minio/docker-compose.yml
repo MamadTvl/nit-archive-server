@@ -31,6 +31,7 @@ services:
         - traefik.http.routers.s3-api-http.entrypoints=http
         - traefik.http.routers.s3-api-http.middlewares=https-redirect #- traefik.http.routers.minio-http.service=minio
         - traefik.http.routers.s3-api-http.service=s3-api
+        - traefik.http.routers.s3-api-https.service=s3-api
         - traefik.http.services.s3-api.loadbalancer.server.port=9000
         - traefik.http.routers.s3-api-https.tls=true
         - traefik.http.routers.s3-api-https.tls.certresolver=le
@@ -41,6 +42,7 @@ services:
         - traefik.http.routers.minio-console-http.entrypoints=http
         - traefik.http.routers.minio-console-http.middlewares=https-redirect
         - traefik.http.routers.minio-console-http.service=minio-console
+        - traefik.http.routers.minio-console-https.service=minio-console
         - traefik.http.services.minio-console.loadbalancer.server.port=9001
         - traefik.http.routers.minio-console-https.tls=true
         - traefik.http.routers.minio-console-https.tls.certresolver=le
