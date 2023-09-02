@@ -20,6 +20,8 @@ services:
                 - traefik.enable=true
                 - traefik.docker.network=traefik-public
                 - traefik.constraint-label=traefik-public
+                - traefik.http.routers.frontend-http.service=frontend
+                - traefik.http.routers.frontend-https.service=frontend
                 - traefik.http.middlewares.https-redirect.redirectscheme.scheme=https
                 - traefik.http.middlewares.https-redirect.redirectscheme.permanent=true
                 - traefik.http.routers.frontend-https.rule=Host(`${FRONTEND_DOMAIN}`)
