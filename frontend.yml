@@ -7,7 +7,7 @@ services:
           context: ./frontend
           args:
             - API_BASE_URL=https://api.nit.edlano.com
-            - DL_BASE_URL=https://dl.nit.edlano.com/nit
+            - DL_BASE_URL=https://dl.nit.edlano.com/nit/
             - IMAGE_DOMAINS=dl.nit.edlano.com
             - DOMAIN=nit.edlano.com
             - BUILD_DEBUG=0
